@@ -1,4 +1,5 @@
 
+#include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
 #include "strace.h"
@@ -22,9 +23,9 @@ int		main(int ac, char **av)
     }
   if ((pid = fork()) == -1)
     exit_error("fork fail");
-  if (!pid) // child
+  if (!pid) /* child */
     exec_child(av[1]);
-  else // parent
+  else /* parent */
     exec_parent(pid);
   return 0;
 }

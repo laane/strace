@@ -8,7 +8,9 @@ SRC=		main.c \
 
 OBJ=		$(SRC:.c=.o)
 
-CFLAGS+=	-W -Wall
+CFLAGS+=	-W -Wall -ansi -pedantic $(DEFINES)
+
+DEFINES=	-D _BSD_SOURCE
 
 $(NAME):	$(OBJ)
 		gcc -o $(NAME) $(OBJ)
