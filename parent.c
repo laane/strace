@@ -1,6 +1,7 @@
 
 #include <sys/ptrace.h>
 #include <sys/wait.h>
+#include <sys/user.h>
 #include <signal.h>
 #include <stdio.h>
 #include "strace.h"
@@ -8,19 +9,20 @@
 static void	get_syscall(int pid)
 {
   static char	flag = 1;
+  struct user	infos;
 
-  (void)pid;
+  if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
+    {      printf("getregs fail\n");      return ;    }
   if (flag)
-    printf("syscall ...");
+    printf("syscall %d ...", (int)infos.regs.orig_rax);
   else
-    printf(" ret\n");
+    printf(" ret 0x%x\n", (int)infos.regs.rax);
   flag = !flag;
 }
 
 static void	trace_process(int pid)
 {
   int		status;
-  long		ret;
 
   while (1)
     {
