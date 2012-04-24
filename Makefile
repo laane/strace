@@ -10,7 +10,7 @@ OBJ=		$(SRC:.c=.o)
 
 CFLAGS+=	-W -Wall -ansi -pedantic $(DEFINES)
 
-DEFINES=	-D _BSD_SOURCE
+DEFINES=	-D _BSD_SOURCE -D _XOPEN_SOURCE
 
 $(NAME):	$(OBJ)
 		gcc -o $(NAME) $(OBJ)
