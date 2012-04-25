@@ -27,12 +27,15 @@ static int	get_syscall(int pid, char **strtab)
   long		word;
   int		status;
 
+  /* Return call informations */
   if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
     {      printf("getregs fail\n");      return 1;    }
   word = ptrace(PTRACE_PEEKTEXT, pid, infos.regs.rip, NULL);
   if ((word & 0xFFFF) != 0x050F)
     return 0;
   printf("%s(...)", strtab[(int)infos.regs.rax]);
+
+  /* Go to return value */
   ptrace(PTRACE_SINGLESTEP, pid, NULL, 0);
   wait4(pid, &status, WUNTRACED, NULL);
   if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
@@ -47,8 +50,8 @@ static void	trace_process(int pid, char **strtab)
 
   while (1)
     {
-      if (get_stopsig(pid, strtab))
-	break;
+      /* if (get_stopsig(pid, strtab)) */
+      /* 	break; */
       wait4(pid, &status, WUNTRACED, NULL);
       if (status == 0)
 	break;
