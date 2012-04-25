@@ -9,9 +9,7 @@
 static char **	get_syscalls(void)
 {
   char		**ret;
-  size_t	len;
-  size_t	size;
-  size_t	i, j;
+  size_t	i, j, len, size;
   FILE*		fd;
 
   if ((fd = fopen("syscall_db", "r")) == NULL)
@@ -20,11 +18,9 @@ static char **	get_syscalls(void)
   ret = malloc(size * sizeof(*ret));
   i = 0;
   ret[i] = NULL;
-  len = 0;
   while (getline(&ret[i], &len, fd) != -1)
     {
-      len = 0;
-      for (j = 0; ret[i][j] && ret[i][j] != ' ' && ret[i][j] != '\t'; ++j);
+      for (j = 0; ret[i][j] && ret[i][j] != '\n'; ++j);
       ret[i][j] = 0;
       if (++i == size)
 	{
@@ -43,6 +39,14 @@ static int	usage(void)
   return 1;
 }
 
+static void	free_strtab(char **tab)
+{
+  size_t	i;
+
+  for (i = 0; tab[i]; ++i)
+    free(tab[i]);
+}
+
 int		main(int ac, char **av)
 {
   char		**syscall_strtab;
@@ -58,12 +62,13 @@ int		main(int ac, char **av)
     }
   syscall_strtab = get_syscalls();
   if (syscall_strtab == NULL)
-    perror("pas de fichier");
+    exit_error("file syscall_db unreachable");
   if ((pid = fork()) == -1)
     exit_error("fork fail");
   if (!pid) /* child */
     exec_child(av[1]);
   else /* parent */
     exec_parent(pid, syscall_strtab);
+  free_strtab(syscall_strtab);
   return 0;
 }

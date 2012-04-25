@@ -8,14 +8,14 @@ SRC=		main.c \
 
 OBJ=		$(SRC:.c=.o)
 
-CFLAGS+=	-W -Wall -ansi -pedantic $(DEFINES) -g
+CFLAGS+=	-W -Wall -ansi -pedantic $(DEFINES)
 
 DEFINES=	-D _BSD_SOURCE -D _XOPEN_SOURCE -D _GNU_SOURCE
 
 SYSCALL_DB=	syscall_db
 
 $(NAME):	$(OBJ)
-		gcc -o $(NAME) $(OBJ) -std=c99
+		gcc -o $(NAME) $(OBJ)
 		./getSyscalls.sh
 
 all:		$(NAME)
