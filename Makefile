@@ -12,8 +12,11 @@ CFLAGS+=	-W -Wall -ansi -pedantic $(DEFINES)
 
 DEFINES=	-D _BSD_SOURCE -D _XOPEN_SOURCE
 
+SYSCALL_DB=	syscall_db
+
 $(NAME):	$(OBJ)
 		gcc -o $(NAME) $(OBJ)
+		./getSyscalls.sh
 
 all:		$(NAME)
 
@@ -22,5 +25,6 @@ clean:
 
 fclean:		clean
 		rm -rf $(NAME)
+		rm -rf $(SYSCALL_DB)
 
 re:		fclean all
