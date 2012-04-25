@@ -14,6 +14,6 @@
 void		exit_error(const char*);
 
 void		exec_child(char*);
-void		exec_parent(int);
+void		exec_parent(int, char **);
 
 #endif /* !STRACE_H_ */
