@@ -1,10 +1,25 @@
 
+#include <string.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 #include <sys/user.h>
 #include <signal.h>
 #include <stdio.h>
 #include "strace.h"
+
+static int	get_stopsig(int pid, char **strtab)
+{
+  siginfo_t	sig;
+
+  (void)strtab;
+  sig.si_signo = 0;
+  if (-1 == ptrace(PTRACE_GETSIGINFO, pid, NULL, &sig))
+    return printf("getsiginfo fail\n");
+  if (sig.si_signo == 0 || sig.si_signo == 5)
+    return 0;
+  printf("Stopped by signal %d : %s\n", sig.si_signo, strerror(sig.si_errno));
+  return 1;
+}
 
 static int	get_syscall(int pid, char **strtab)
 {
@@ -32,6 +47,8 @@ static void	trace_process(int pid, char **strtab)
 
   while (1)
     {
+      if (get_stopsig(pid, strtab))
+	break;
       wait4(pid, &status, WUNTRACED, NULL);
       if (status == 0)
 	break;
