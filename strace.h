@@ -8,6 +8,14 @@
 # define NULL	(void*)0
 #endif
 
+# define	MAXPARAMS	7
+
+struct	syscalls
+{
+  char	*name;
+  char	*rtype;
+  char	*p[MAXPARAMS];   /* les parametres */
+};
 
 /*
 ** Prototypes
