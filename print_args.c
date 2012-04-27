@@ -40,9 +40,10 @@ static void	print_string(struct user infos, int i, int pid)
     fprintf(stderr, "...");
 }
 
-/* static void	print_(struct user infos, int i, int pid) */
-/* { */
-/* } */
+static void	print_strtab(struct user infos, int i, int pid)
+{
+
+}
 
 # define MATCH(x) (!strcmp(args[i], x))
 
@@ -57,9 +58,11 @@ void	print_args(const char *call, char **args, struct user infos, int pid)
       fprintf(stderr, "%d", (int)get_reg(infos, i));
     else if (MATCH("off_t"))
       fprintf(stderr, "%lu", get_reg(infos, i));
-    else if (MATCH("void*"))
+    else if (MATCH("void*") || MATCH("unsigned long"))
       fprintf(stderr, !get_reg(infos, i) && !strcmp(call, "mmap") ?
 	      "NULL" : "%#lx", get_reg(infos, i));
+    else if (MATCH("char**"))
+      print_strtab(infos, i, pid);
     else
       fprintf(stderr, "%s", args[i]);
     if (args[i+1])
