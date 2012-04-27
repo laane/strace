@@ -32,34 +32,36 @@ static void	print_string(struct user infos, int i, int pid)
   char		c;
   int		j = 0;
 
-  printf("\"");
-  while ((c = ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j++, NULL)))
-    printf("%c", c);
-  printf("\"");
+  fprintf(stderr, "\"");
+  while ((c = ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j++, NULL)) && j < 60)
+    fprintf(stderr, (c == '\n') ? "\\n" : "%c", c);
+  fprintf(stderr, "\"");
+  if (j == 60)
+    fprintf(stderr, "...");
 }
 
-static void	print_(struct user infos, int i, int pid)
-{
-}
+/* static void	print_(struct user infos, int i, int pid) */
+/* { */
+/* } */
 
 # define MATCH(x) (!strcmp(args[i], x))
 
 void	print_args(const char *call, char **args, struct user infos, int pid)
 {
   for (int i = 0; args[i]; ++i) {
-    if (MATCH("char*") || MATCH("const char*")
+    if (MATCH("char*")
 	|| (!strcmp(call, "write")
-	    && (MATCH("const void*") || MATCH("void*"))))
+	    && (MATCH("void*") || MATCH("void*"))))
       print_string(infos, i, pid);
     else if (MATCH("int") || MATCH("size_t"))
-      printf("%d", (int)get_reg(infos, i));
+      fprintf(stderr, "%d", (int)get_reg(infos, i));
     else if (MATCH("off_t"))
-      printf("%lu", get_reg(infos, i));
+      fprintf(stderr, "%lu", get_reg(infos, i));
     else if (MATCH("void*"))
-      printf("%#lx", get_reg(infos, i));
+      fprintf(stderr, "%#lx", get_reg(infos, i));
     else
-      printf("%s", args[i]);
+      fprintf(stderr, "%s", args[i]);
     if (args[i+1])
-      printf(", ");
+      fprintf(stderr, ", ");
   }
 }

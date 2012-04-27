@@ -15,21 +15,21 @@ struct syscalls	g_syscalls[] =
 				  "size_t",
 				  NULL }},
     { "write",	"ssize_t",	{ "int",
-				  "const void*",
+				  "void*",
 				  "size_t",
 				  NULL }},
-    { "open",	"int",		{ "const char*",
+    { "open",	"int",		{ "char*",
 				  "int",
 				  NULL }},
     { "close",	"int",		{ "int",
 				  NULL }},
-    { "stat",	"int",		{ "const char*",
+    { "stat",	"int",		{ "char*",
 				  "struct stat*",
 				  NULL }},
     { "fstat",	"int",		{"int",
 				 "struct stat*",
 				 NULL }},
-    { "lstat",	"int",		{"const char*",
+    { "lstat",	"int",		{"char*",
 				 "struct stat*",
 				 NULL }},
     { "poll",	"int",		{ "struct pollfd*",
@@ -72,7 +72,7 @@ struct syscalls	g_syscalls[] =
 					  "off_t",
 					  NULL }},
     { "pwrite64",	"ssize_t",	{ "int",
-					  "const void*",
+					  "void*",
 					  "size_t",
 					  "off_t",
 					  NULL }},
@@ -84,7 +84,7 @@ struct syscalls	g_syscalls[] =
 				  "const struct iovec*",
 				  "int",
 				  NULL }},
-    { "access",	"int",		{ "const char*",
+    { "access",	"int",		{ "char*",
 				  "int",
 				  NULL }},
     { "pipe",	"int",		{ "int[2]",
@@ -120,7 +120,7 @@ struct syscalls	g_syscalls[] =
 				  "int",
 				  NULL }},
     { "shmat",	"void*",	{ "int",
-				  "const void*",
+				  "void*",
 				  "int",
 				  NULL }},
     { "shmctl",	"int",		{ "int",
@@ -166,7 +166,7 @@ struct syscalls	g_syscalls[] =
 				  "socklen_t*",
 				  NULL }},
     { "sendto", "ssize_t",	{ "int",
-				  "const void*",
+				  "void*",
 				  "size_t",
 				  "int",
 				  NULL }},
@@ -211,7 +211,7 @@ struct syscalls	g_syscalls[] =
     { "setsockopt",	"int",	{ "int",
 				  "int",
 				  "int",
-				  "const void*",
+				  "void*",
 				  "socklen_t",
 				  NULL }},
     { "getsockopt",	"int",	{ "int",
@@ -230,9 +230,9 @@ struct syscalls	g_syscalls[] =
 				  NULL }},
     { "vfork",	"pid_t",	{ "void",
 				  NULL }},
-    { "execve",		"int",	{ "const char*",
-				  "char*const*",
-				  "char*const*",
+    { "execve",		"int",	{ "char*",
+				  "char**",
+				  "char**",
 				  NULL }},    
     { "exit",		"void",	{ "int",
 				  NULL }},
@@ -258,13 +258,13 @@ struct syscalls	g_syscalls[] =
 				  "int",
 				  "int",
 				  NULL }},
-    { "shmdt",		"int",	{ "const void*",
+    { "shmdt",		"int",	{ "void*",
 				  NULL }},
     { "msgget",		"int",	{ "key_t",
 				  "int",
 				  NULL }},
     { "msgsnd",		"int",	{ "int",
-				  "const void*",
+				  "void*",
 				  "size_t",
 				  "int",
 				  NULL }},
@@ -289,7 +289,7 @@ struct syscalls	g_syscalls[] =
 				  NULL }},
     { "fdatasync",	"int",	{ "int",
 				  NULL }},
-    { "truncate",	"int",	{ "const char*",
+    { "truncate",	"int",	{ "char*",
 				  "off_t",
 				  NULL }},
     { "ftruncate",	"int",	{ "int",
@@ -302,40 +302,40 @@ struct syscalls	g_syscalls[] =
     { "getcwd",	"char*",	{ "char*",
 				  "size_t",
 				  NULL }},
-    { "chdir",		"int",	{ "const char*",
+    { "chdir",		"int",	{ "char*",
 				  NULL }},
     { "fchdir",		"int",	{ "int",
 				  NULL }},
-    { "rename",		"int",	{ "const char*",
-				  "const char*",
+    { "rename",		"int",	{ "char*",
+				  "char*",
 				  NULL }},
-    { "mkdir",		"int",	{ "const char*",
+    { "mkdir",		"int",	{ "char*",
 				  "mode_t",
 				  NULL }},
-    { "rmdir",		"int",	{ "const char*",
+    { "rmdir",		"int",	{ "char*",
 				  NULL }},
-    { "creat",		"int",	{ "const char*",
+    { "creat",		"int",	{ "char*",
 				  "mode_t",
 				  NULL }},
-    { "link",		"int",	{ "const char*",
-				  "const char*",
+    { "link",		"int",	{ "char*",
+				  "char*",
 				  NULL }},
-    { "unlink",		"int",	{ "const char*",
+    { "unlink",		"int",	{ "char*",
 				  NULL }},
-    { "symlink",	"int",	{ "const char*",
-				  "const char*",
+    { "symlink",	"int",	{ "char*",
+				  "char*",
 				  NULL }},
-    { "readlink", "ssize_t",	{ "const char*",
+    { "readlink", "ssize_t",	{ "char*",
 				  "char*",
 				  "size_t",
 				  NULL }},
-    { "chmod",		"int",	{ "const char*",
+    { "chmod",		"int",	{ "char*",
 				  "mode_t",
 				  NULL }},
     { "fchmod",		"int",	{ "int",
 				  "mode_t",
 				  NULL }},
-    { "chown",		"int",	{ "const char*",
+    { "chown",		"int",	{ "char*",
 				  "uid_t",
 				  "gid_t",
 				  NULL }},
@@ -343,7 +343,7 @@ struct syscalls	g_syscalls[] =
 				  "uid_t",
 				  "gid_t",
 				  NULL }},
-    { "lchown",		"int",	{ "const char*",
+    { "lchown",		"int",	{ "char*",
 				  "uid_t",
 				  "gid_t",
 				  NULL }},
@@ -431,7 +431,7 @@ struct syscalls	g_syscalls[] =
 				  "cap_user_data_t",
 				  NULL }},
     { "capset",	"int",		{ "cap_user_header_t",
-				  "const cap_user_data_t",
+				  "cap_user_data_t",
 				  NULL }},
     { "rt_sigpending",	"int",	{ "sigset_t*",
 				  NULL }},
@@ -448,21 +448,21 @@ struct syscalls	g_syscalls[] =
     { "sigaltstack",	"int",	{ "const stack_t*",
 				  "stack_t*",
 				  NULL }},
-    { "utime",	"int",		{ "const char*",
+    { "utime",	"int",		{ "char*",
 				  "const struct utimbuf*",
 				  NULL }},
-    { "mknod",	"int",		{ "const char*",
+    { "mknod",	"int",		{ "char*",
 				  "mode_t",
 				  "dev_t",
 				  NULL }},
-    { "uselib",	"int",		{ "const char*",
+    { "uselib",	"int",		{ "char*",
 				  NULL }},
     { "personality",	"int",	{ "unsigned long",
 				  NULL }},
     { "ustat",	"int",		{ "dev_t",
 				  "struct ustat*",
 				  NULL }},
-    { "statfs",	"int",		{ "const char*",
+    { "statfs",	"int",		{ "char*",
 				  "struct statfs*",
 				  NULL }},
     { "fstatfs",	"int",	{ "int",
@@ -500,7 +500,7 @@ struct syscalls	g_syscalls[] =
     { "mlock",	"int",		{ "cont void*",
 				  "size_t",
 				  NULL }},
-    { "munlock",	"int",	{ "const void*",
+    { "munlock",	"int",	{ "void*",
 				  "size_t",
 				  NULL }},
     { "mlockall",	"int",	{ "int",
@@ -513,8 +513,8 @@ struct syscalls	g_syscalls[] =
 				  "void*",
 				  "unsigned long",
 				  NULL }},
-    { "pivot_root",	"int",	{ "const char*",
-				  "const char*",
+    { "pivot_root",	"int",	{ "char*",
+				  "char*",
 				  NULL}},
     { "_sysctl",	"int",	{ "struct __sysctl_args*",
 				  NULL }},
@@ -532,35 +532,35 @@ struct syscalls	g_syscalls[] =
     { "setrlimit",	"int",	{ "int",
 				  "const struct rlimit*",
 				  NULL }},
-    { "chroot",	"int",		{ "const char*",
+    { "chroot",	"int",		{ "char*",
 				  NULL }},
     { "sync",	"void",		{ "void",
 				  NULL }},
-    { "acct",	"int",		{ "const char*",
+    { "acct",	"int",		{ "char*",
 				  NULL }},
     { "settimeofday",	"int",	{ "const struct timeval*",
 				  "const struct simezone*",
 				  NULL }},
-    { "mount",	"int",		{ "const char*",
-				  "const char*",
-				  "const char*",
+    { "mount",	"int",		{ "char*",
+				  "char*",
+				  "char*",
 				  "unsigned long",
-				  "const void*",
+				  "void*",
 				  NULL }},
-    { "umount2",	"int",	{ "const char*",
+    { "umount2",	"int",	{ "char*",
 				  "int",
 				  NULL }},
-    { "swapon",	"int",		{ "const char*",
+    { "swapon",	"int",		{ "char*",
 				  "int",
 				  NULL }},
-    { "swapoff",	"int",	{ "const char*",
+    { "swapoff",	"int",	{ "char*",
 				  NULL }},
     { "reboot",	"int",		{ "int",
 				  NULL }},
-    { "sethostname",	"int",	{ "const char*",
+    { "sethostname",	"int",	{ "char*",
 				  "size_t",
 				  NULL }},
-    { "setdomainname",	"int",	{ "const char*",
+    { "setdomainname",	"int",	{ "char*",
 				  "size_t",
 				  NULL }},
     { "iopl",	"int",		{ "int",
@@ -569,24 +569,24 @@ struct syscalls	g_syscalls[] =
 				  "unsigned long",
 				  "int",
 				  NULL }},
-    { "create_module",	"caddr_t",	{ "const char*",
+    { "create_module",	"caddr_t",	{ "char*",
 					  "size_t",
 					  NULL }},
-    { "init_module",	"int",	{ "const char*",
+    { "init_module",	"int",	{ "char*",
 				  "struct module*",
 				  NULL }},
-    { "delete_module",	"int",	{ "const char*",
+    { "delete_module",	"int",	{ "char*",
 				  NULL }},
     { "get_kernel_syms",	"int",	{ "struct kernel_sym*",
 					  NULL }},
-    { "query_module",	"int",	{ "const char*",
+    { "query_module",	"int",	{ "char*",
 				  "int",
 				  "void*",
 				  "size_t",
 				  "size_t",
 				  NULL }},
     { "quotactl",	"int",	{ "int",
-				  "const char*",
+				  "char*",
 				  "int",
 				  "caddr_t",
 				  NULL }},
@@ -718,7 +718,7 @@ struct syscalls	g_syscalls[] =
 				  "int",
 				  "int",
 				  NULL }},
-    { "utimes",	"int",		{ "const char*",
+    { "utimes",	"int",		{ "char*",
 				  "const struct timeval[2]",
 				  NULL }},
     { "mbind",	"int",		{ "void*",
@@ -741,12 +741,12 @@ static int	get_stopsig(int pid, char **strtab)
   (void)strtab;
   sig.si_signo = 0;
   if (-1 == ptrace(PTRACE_GETSIGINFO, pid, NULL, &sig))
-    return printf("getsiginfo fail\n");
+    return fprintf(stderr, "getsiginfo fail\n");
   if (sig.si_signo == 0 || sig.si_signo == 18 /* SIGCONT 18 19 25 ... */
       || sig.si_signo == 19 || sig.si_signo == 25
       || sig.si_signo == SIGTRAP)
     return 0;
-  printf("Killed by signal %d : %s\n", sig.si_signo, strerror(sig.si_errno));
+  fprintf(stderr, "Killed by signal %d : %s\n", sig.si_signo, strerror(sig.si_errno));
   return 1;
 }
 
@@ -770,30 +770,31 @@ static int	get_syscall(int pid, char **strtab)
 
   /* Return call informations */
   if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
-    {      printf("getregs fail\n");      return 1;    }
+    {      fprintf(stderr, "getregs fail\n");      return 1;    }
   word = ptrace(PTRACE_PEEKTEXT, pid, infos.regs.rip, NULL);
   if ((word & 0xFFFF) != 0x050F)
     return 0;
   if (!(call = get_call_infos(strtab[(int)infos.regs.rax])))
     {
-      printf("Unknown call...\n");
+      fprintf(stderr, "Unknown call...\n");
       return 0;
     }
-  printf("%s(", call->name);
+  fprintf(stderr, "%s(", call->name);
   print_args(call->name, call->p, infos, pid);
-  printf(")");
+  fprintf(stderr, ")");
+  fflush(stderr);
   /* Go to return value */
   ptrace(PTRACE_SINGLESTEP, pid, NULL, 0);
   wait4(pid, &status, WUNTRACED, NULL);
   if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
-    {      printf("\n");      return 1;    }
+    {      fprintf(stderr, "\t= ?\n");      return 1;    }
   if (strchr(call->rtype, '*'))
-    printf("\t= %#lx\n", infos.regs.rax);
+    fprintf(stderr, "\t= %#lx\n", infos.regs.rax);
   else    
-    printf("\t= %ld\n", infos.regs.rax);
+    fprintf(stderr, "\t= %ld\n", infos.regs.rax);
 
   /* if (infos.regs.rdi) */
-  /*   printf(">>>>>>> %s\n", infos.regs.rdi); */
+  /*   fprintf(stderr, ">>>>>>> %s\n", infos.regs.rdi); */
   return 0;
 }
 
