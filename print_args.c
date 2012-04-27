@@ -58,7 +58,8 @@ void	print_args(const char *call, char **args, struct user infos, int pid)
     else if (MATCH("off_t"))
       fprintf(stderr, "%lu", get_reg(infos, i));
     else if (MATCH("void*"))
-      fprintf(stderr, "%#lx", get_reg(infos, i));
+      fprintf(stderr, !get_reg(infos, i) && !strcmp(call, "mmap") ?
+	      "NULL" : "%#lx", get_reg(infos, i));
     else
       fprintf(stderr, "%s", args[i]);
     if (args[i+1])
