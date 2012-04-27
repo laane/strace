@@ -779,13 +779,8 @@ static int	get_syscall(int pid, char **strtab)
       printf("Unknown call...\n");
       return 0;
     }
-  printf("%s\t", call->rtype);
   printf("%s(", call->name);
-  for (int i = 0; call->p[i]; ++i) {
-    printf("%s", call->p[i]);
-    if (call->p[i+1])
-      printf(", ");
-  }
+  print_args(call->p, infos, pid);
   printf(")");
   /* Go to return value */
   ptrace(PTRACE_SINGLESTEP, pid, NULL, 0);
