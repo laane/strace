@@ -8,7 +8,7 @@ SRC=		main.c \
 
 OBJ=		$(SRC:.c=.o)
 
-CFLAGS+=	-W -Wall -ansi -pedantic $(DEFINES)
+CFLAGS+=	-W -Wall -ansi -pedantic $(DEFINES) -std=c99
 
 DEFINES=	-D _BSD_SOURCE -D _XOPEN_SOURCE -D _GNU_SOURCE
 
@@ -16,7 +16,7 @@ SYSCALL_DB=	syscall_db
 
 $(NAME):	$(OBJ)
 		gcc -o $(NAME) $(OBJ)
-		# ./getSyscalls.sh
+		./getSyscalls.sh
 
 all:		$(NAME)
 
@@ -25,6 +25,6 @@ clean:
 
 fclean:		clean
 		rm -rf $(NAME)
-		# rm -rf $(SYSCALL_DB)
+		rm -rf $(SYSCALL_DB)
 
 re:		fclean all

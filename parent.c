@@ -464,9 +464,21 @@ static int	get_stopsig(int pid, char **strtab)
   return 1;
 }
 
+static struct syscalls	*get_call_infos(const char *name)
+{
+  size_t	i = 0;
+
+  while (g_syscalls[i].name && strcmp(g_syscalls[i].name, name))
+    ++i;
+  if (g_syscalls[i].name)
+    return &g_syscalls[i];
+  return NULL;
+}
+
 static int	get_syscall(int pid, char **strtab)
 {
   struct user	infos;
+  struct syscalls *call;
   long		word;
   int		status;
 
@@ -476,17 +488,31 @@ static int	get_syscall(int pid, char **strtab)
   word = ptrace(PTRACE_PEEKTEXT, pid, infos.regs.rip, NULL);
   if ((word & 0xFFFF) != 0x050F)
     return 0;
-  printf("%s(...)", strtab[(int)infos.regs.rax]);
-
+  if (!(call = get_call_infos(strtab[(int)infos.regs.rax])))
+    {
+      printf("Unknown call...\n");
+      return 0;
+    }
+  printf("%s\t", call->rtype);
+  printf("%s(", call->name);
+  for (int i = 0; call->p[i]; ++i) {
+    printf("%s", call->p[i]);
+    if (call->p[i+1])
+      printf(", ");
+  }
+  printf(")");
   /* Go to return value */
   ptrace(PTRACE_SINGLESTEP, pid, NULL, 0);
   wait4(pid, &status, WUNTRACED, NULL);
   if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
     {      printf("\n");      return 1;    }
-  printf(" ret : %ld\n", infos.regs.rax);
+  if (strchr(call->rtype, '*'))
+    printf("\t= %#lx\n", infos.regs.rax);
+  else    
+    printf("\t= %ld\n", infos.regs.rax);
 
-  if (infos.regs.rdi)
-    printf(">>>>>>> %s\n", infos.regs.rdi);
+  /* if (infos.regs.rdi) */
+  /*   printf(">>>>>>> %s\n", infos.regs.rdi); */
   return 0;
 }
 
