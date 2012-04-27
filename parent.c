@@ -780,7 +780,7 @@ static int	get_syscall(int pid, char **strtab)
       return 0;
     }
   printf("%s(", call->name);
-  print_args(call->p, infos, pid);
+  print_args(call->name, call->p, infos, pid);
   printf(")");
   /* Go to return value */
   ptrace(PTRACE_SINGLESTEP, pid, NULL, 0);
