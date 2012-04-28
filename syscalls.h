@@ -975,5 +975,9 @@ struct syscalls	g_syscalls[] =
 				  "unsigned*",
 				  "struct getcpu_cache*",
 				  NULL }},
+    { "mprotect",	"int",	{ "void*",
+				  "size_t",
+				  "int",
+				  NULL }},
     { NULL,	NULL,		{ NULL }}
   };
