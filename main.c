@@ -52,17 +52,29 @@ extern char	**environ;
 
 static char	*getbinary(char *arg)
 {
+  char		*path = getenv("PATH");
+  char		*p;
   char		*bin;
 
-  for (int i = 0; environ[i]; ++i)
+  if (0 == access(arg, X_OK))
+    return arg;
+  if (!path)
     {
-      bin = strdup(environ[i]);
+      if (0 != access(arg, X_OK))
+	return NULL;
+      return arg;
+    }
+  while ((p = strtok(path, ":")))
+    {
+      bin = strdup(p);
       bin = realloc(bin, strlen(bin) + strlen(arg) + 10);
       bin = strcat(bin, "/");
       bin = strcat(bin, arg);
-      if (!access(bin, X_OK))
+      if (0 == access(bin, X_OK))
 	return bin;
       free(bin);
+      path = NULL;
+      p = NULL;
     }
   return NULL;
 }
@@ -70,12 +82,13 @@ static char	*getbinary(char *arg)
 int		main(int ac, char **av)
 {
   char		**syscall_strtab;
+  char		*bin;
   pid_t		pid;
 
   if (ac != 2)
     return usage();
   /* if (access(av[1], X_OK)) */
-  if (getbinary(av[1]))
+  if (NULL == (bin = getbinary(av[1])))
     {
       fprintf(stderr, "File %s doesnt exist or has not execute permissions\n",
   	      av[1]);
@@ -87,7 +100,7 @@ int		main(int ac, char **av)
   if ((pid = fork()) == -1)
     exit_error("fork fail");
   if (!pid) /* child */
-    exec_child(av[1]);
+    exec_child(bin);
   else /* parent */
     exec_parent(pid, syscall_strtab);
   free_strtab(syscall_strtab);
