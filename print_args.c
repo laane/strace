@@ -27,13 +27,13 @@ static unsigned long	get_reg(struct user info, int i)
   return 0;
 }
 
-static void	print_string(struct user infos, int i, int pid)
+static void	print_string(long reg, int pid)
 {
   char		c;
   int		j = 0;
 
   fprintf(stderr, "\"");
-  while ((c = ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j++, NULL))
+  while ((c = ptrace(PTRACE_PEEKTEXT, pid, reg + j++, NULL))
 	 && j < 60)
     fprintf(stderr, (c == '\n') ? "\\n" : "%c", c);
   fprintf(stderr, "\"");
@@ -41,26 +41,26 @@ static void	print_string(struct user infos, int i, int pid)
     fprintf(stderr, "...");
 }
 
-static int	count_args(struct user infos, int i, int pid)
+static int	count_args(long reg, int pid)
 {
   int		j = 0;
 
-  while (ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j, NULL))
+  while (ptrace(PTRACE_PEEKTEXT, pid, reg + j, NULL))
     j += sizeof(long);
   return j / sizeof(long);
 }
 
-static void	print_strtab(struct user infos, int i, int pid)
+static void	print_strtab(long reg, int pid)
 {
   char		c;
   int		nb;
   long		addr;
   int		j = 0;
 
-  if ((nb = count_args(infos, i, pid)) > 3)
+  if ((nb = count_args(reg, pid)) > 3)
     {    fprintf(stderr, "[/* %d vars */]", nb);      return ;    }
   fprintf(stderr, "[");
-  while ((addr = ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j, NULL)))
+  while ((addr = ptrace(PTRACE_PEEKTEXT, pid, reg + j, NULL)))
     {
       int	k = 0;
       fprintf(stderr, "\"");
@@ -70,7 +70,7 @@ static void	print_strtab(struct user infos, int i, int pid)
       if (k == 60)
 	fprintf(stderr, "...");
       j += sizeof(long);
-      if (ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j, NULL))
+      if (ptrace(PTRACE_PEEKTEXT, pid, reg + j, NULL))
 	fprintf(stderr, ", ");
     }
   fprintf(stderr, "]");
@@ -80,21 +80,24 @@ static void	print_strtab(struct user infos, int i, int pid)
 
 void	print_args(const char *call, char **args, struct user infos, int pid)
 {
+  long	reg;
+
   for (int i = 0; args[i]; ++i) {
+    reg = get_reg(infos, i);
     if (MATCH("char*")
 	|| (!strcmp(call, "write")
 	    && (MATCH("void*") || MATCH("void*"))))
-      print_string(infos, i, pid);
+      print_string(reg, pid);
     else if (MATCH("int") || MATCH("size_t"))
-      fprintf(stderr, "%d", (int)get_reg(infos, i));
+      fprintf(stderr, "%d", (int)reg);
     else if (MATCH("off_t"))
-      fprintf(stderr, "%lu", get_reg(infos, i));
+      fprintf(stderr, "%lu", reg);
     else if (MATCH("void*") || MATCH("unsigned long"))
-      fprintf(stderr, !get_reg(infos, i) && !strcmp(call, "mmap") ?
-	      "NULL" : "%#lx", get_reg(infos, i));
+      fprintf(stderr, !reg && !strcmp(call, "mmap") ?
+	      "NULL" : "%#lx", reg);
     else if (MATCH("char**") &&
 	     (!strcmp(call, "execve")))
-      print_strtab(infos, i, pid);
+      print_strtab(reg, pid);
     else
       fprintf(stderr, "%s", args[i]);
     if (args[i+1])
