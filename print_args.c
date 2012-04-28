@@ -8,8 +8,6 @@
 #include <errno.h>
 #include "strace.h"
 
-/* extern struct syscalls g_syscalls[]; */
-
 static unsigned long	get_reg(struct user info, int i)
 {
   if (i == 0)
@@ -53,17 +51,16 @@ static int	count_args(long reg, int pid)
 static void	print_strtab(long reg, int pid)
 {
   char		c;
-  int		nb;
   long		addr;
-  int		j = 0;
+  int		nb, k, j = 0;
 
   if ((nb = count_args(reg, pid)) > 3)
     {    fprintf(stderr, "[/* %d vars */]", nb);      return ;    }
   fprintf(stderr, "[");
   while ((addr = ptrace(PTRACE_PEEKTEXT, pid, reg + j, NULL)))
     {
-      int	k = 0;
       fprintf(stderr, "\"");
+      k = 0;
       while ((c = ptrace(PTRACE_PEEKTEXT, pid, addr + k++, NULL)) && k < 60)
   	fprintf(stderr, (c == '\n') ? "\\n" : "%c", c);
       fprintf(stderr, "\"");
@@ -77,17 +74,22 @@ static void	print_strtab(long reg, int pid)
 }
 
 # define MATCH(x) (!strcmp(args[i], x))
-
 void	print_args(const char *call, char **args, struct user infos, int pid)
 {
   long	reg;
 
   for (int i = 0; args[i]; ++i) {
     reg = get_reg(infos, i);
-    if (MATCH("char*")
-	|| (!strcmp(call, "write")
-	    && (MATCH("void*") || MATCH("void*"))))
+    if (MATCH("char*") ||
+	(!strcmp(call, "write")
+	 && (MATCH("void*") || MATCH("void*"))))
       print_string(reg, pid);
+    else if (MATCH("int")
+	     && (
+		 (!strcmp(call, "access") && i == 1) ||
+		 (!strcmp(call, "open") && i == 1)
+		 ))
+      int_enum((int)reg, call, i);
     else if (MATCH("int") || MATCH("size_t"))
       fprintf(stderr, "%d", (int)reg);
     else if (MATCH("off_t"))

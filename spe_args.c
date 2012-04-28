@@ -1,0 +1,61 @@
+
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include "strace.h"
+#include "enums.h"
+
+static void	enum_access(int val)
+{
+  char		flag = 0;
+
+  if (val == F_OK)
+    {
+      fprintf(stderr, "F_OK");
+      return ;
+    }
+  for (int i = 0; access_flags[i].str; ++i)
+    if (access_flags[i].val & val)
+      {
+	fprintf(stderr, (flag ? "|%s" : "%s"), access_flags[i].str);
+	flag = 1;
+      }
+}
+
+static void	enum_open(int val)
+{
+  char		flag = 0;
+
+  if (val & O_RDWR)
+    {
+      fprintf(stderr, "O_RDWR");
+      flag = 1;
+    }
+  else if (val & O_WRONLY)
+    {
+      fprintf(stderr, "O_WRONLY");
+      flag = 1;
+    }
+  else /* O_RDONLY */
+    {
+      fprintf(stderr, "O_RDONLY");
+      flag = 1;
+    }
+  for (int i = 0; open_flags[i].str; ++i)
+    if (open_flags[i].val & val)
+      {
+	fprintf(stderr, (flag ? "|%s" : "%s"), open_flags[i].str);
+	flag = 1;
+      }
+}
+
+#define MATCH(x)	(!strcmp(call, x))
+void		int_enum(int value, const char* call, int i)
+{
+  (void) i;
+  if (MATCH("access"))
+    enum_access(value);
+  if (MATCH("open"))
+    enum_open(value);
+}

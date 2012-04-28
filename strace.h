@@ -27,5 +27,6 @@ void		exit_error(const char*);
 void		exec_child(char*);
 void		exec_parent(int, char **);
 void		print_args(const char*, char **, struct user, int);
+void		int_enum(int, const char*, int);
 
 #endif /* !STRACE_H_ */
