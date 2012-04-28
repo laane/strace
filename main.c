@@ -1,4 +1,5 @@
 
+#include <string.h>
 #include <sys/types.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,6 +48,25 @@ static void	free_strtab(char **tab)
     free(tab[i]);
 }
 
+extern char	**environ;
+
+static char	*getbinary(char *arg)
+{
+  char		*bin;
+
+  for (int i = 0; environ[i]; ++i)
+    {
+      bin = strdup(environ[i]);
+      bin = realloc(bin, strlen(bin) + strlen(arg) + 10);
+      bin = strcat(bin, "/");
+      bin = strcat(bin, arg);
+      if (!access(bin, X_OK))
+	return bin;
+      free(bin);
+    }
+  return NULL;
+}
+
 int		main(int ac, char **av)
 {
   char		**syscall_strtab;
@@ -54,7 +74,8 @@ int		main(int ac, char **av)
 
   if (ac != 2)
     return usage();
-  if (access(av[1], X_OK))
+  /* if (access(av[1], X_OK)) */
+  if (getbinary(av[1]))
     {
       fprintf(stderr, "File %s doesnt exist or has not execute permissions\n",
   	      av[1]);
