@@ -1,5 +1,6 @@
 
 #include <unistd.h>
+#include <sys/mman.h>
 #include <fcntl.h>
 #include "strace.h"
 
@@ -33,5 +34,31 @@ t_flags		open_flags[] =
     {O_NONBLOCK, "O_NONBLOCK"},
     {O_SYNC, "O_SYNC"},
     {O_TRUNC, "O_TRUNC"},
+    {0, NULL}
+  };
+
+t_flags		mmap_prot[] =
+  {
+    {PROT_EXEC, "PROT_EXEC"},
+    {PROT_READ, "PROT_READ"},
+    {PROT_WRITE, "PROT_WRITE"},
+    {0, NULL}
+  };
+
+t_flags		mmap_flags[] =
+  {
+    {MAP_SHARED, "MAP_SHARED"},
+    {MAP_PRIVATE, "MAP_PRIVATE"},
+    {MAP_32BIT, "MAP_32BIT"},
+    {MAP_ANONYMOUS, "MAP_ANONYMOUS"},
+    {MAP_DENYWRITE, "MAP_DENYWRITE"},
+    {MAP_FIXED, "MAP_FIXED"},
+    {MAP_GROWSDOWN, "MAP_GROWSDOWN"},
+    {MAP_HUGETLB, "MAP_HUGETLB"},
+    {MAP_LOCKED, "MAP_LOCKED"},
+    {MAP_NONBLOCK, "MAP_NONBLOCK"},
+    {MAP_NORESERVE, "MAP_NORESERVE"},
+    {MAP_POPULATE, "MAP_POPULATE"},
+    {MAP_STACK, "MAP_STACK"},
     {0, NULL}
   };

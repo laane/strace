@@ -80,17 +80,21 @@ void	print_args(const char *call, char **args, struct user infos, int pid)
 
   for (int i = 0; args[i]; ++i) {
     reg = get_reg(infos, i);
-    if (MATCH("char*") ||
-	(!strcmp(call, "write")
-	 && (MATCH("void*") || MATCH("void*"))))
+    if (strchr(args[i], '*') && reg == 0)
+      fprintf(stderr, "NULL");
+    else if (MATCH("char*") ||
+	     (!strcmp(call, "write")
+	      && (MATCH("void*") || MATCH("void*"))))
       print_string(reg, pid);
     else if (MATCH("int")
 	     && (
 		 (!strcmp(call, "access") && i == 1) ||
-		 (!strcmp(call, "open") && i == 1)
+		 (!strcmp(call, "open") && i == 1) ||
+		 (!strcmp(call, "mmap") && (i == 2 || i == 3))
 		 ))
       int_enum((int)reg, call, i);
-    else if (MATCH("int") || MATCH("size_t"))
+    else if (MATCH("int") || MATCH("unsigned int")
+	     || MATCH("size_t"))
       fprintf(stderr, "%d", (int)reg);
     else if (MATCH("off_t"))
       fprintf(stderr, "%lu", reg);
