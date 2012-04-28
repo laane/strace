@@ -8,7 +8,7 @@
 #include <errno.h>
 #include "strace.h"
 
-extern struct syscalls g_syscalls[];
+/* extern struct syscalls g_syscalls[]; */
 
 static unsigned long	get_reg(struct user info, int i)
 {
@@ -33,16 +33,47 @@ static void	print_string(struct user infos, int i, int pid)
   int		j = 0;
 
   fprintf(stderr, "\"");
-  while ((c = ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j++, NULL)) && j < 60)
+  while ((c = ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j++, NULL))
+	 && j < 60)
     fprintf(stderr, (c == '\n') ? "\\n" : "%c", c);
   fprintf(stderr, "\"");
   if (j == 60)
     fprintf(stderr, "...");
 }
 
+static int	count_args(struct user infos, int i, int pid)
+{
+  int		j = 0;
+
+  while (ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j, NULL))
+    j += sizeof(long);
+  return j / sizeof(long);
+}
+
 static void	print_strtab(struct user infos, int i, int pid)
 {
+  char		c;
+  int		nb;
+  long		addr;
+  int		j = 0;
 
+  if ((nb = count_args(infos, i, pid)) > 3)
+    {    fprintf(stderr, "[/* %d vars */]", nb);      return ;    }
+  fprintf(stderr, "[");
+  while ((addr = ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j, NULL)))
+    {
+      int	k = 0;
+      fprintf(stderr, "\"");
+      while ((c = ptrace(PTRACE_PEEKTEXT, pid, addr + k++, NULL)) && k < 60)
+  	fprintf(stderr, (c == '\n') ? "\\n" : "%c", c);
+      fprintf(stderr, "\"");
+      if (k == 60)
+	fprintf(stderr, "...");
+      j += sizeof(long);
+      if (ptrace(PTRACE_PEEKTEXT, pid, get_reg(infos, i) + j, NULL))
+	fprintf(stderr, ", ");
+    }
+  fprintf(stderr, "]");
 }
 
 # define MATCH(x) (!strcmp(args[i], x))
@@ -61,7 +92,8 @@ void	print_args(const char *call, char **args, struct user infos, int pid)
     else if (MATCH("void*") || MATCH("unsigned long"))
       fprintf(stderr, !get_reg(infos, i) && !strcmp(call, "mmap") ?
 	      "NULL" : "%#lx", get_reg(infos, i));
-    else if (MATCH("char**"))
+    else if (MATCH("char**") &&
+	     (!strcmp(call, "execve")))
       print_strtab(infos, i, pid);
     else
       fprintf(stderr, "%s", args[i]);
