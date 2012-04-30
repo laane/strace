@@ -90,7 +90,8 @@ void	print_args(const char *call, char **args, struct user infos, int pid)
 	     && (
 		 (!strcmp(call, "access") && i == 1) ||
 		 (!strcmp(call, "open") && i == 1) ||
-		 (!strcmp(call, "mmap") && (i == 2 || i == 3))
+		 (!strcmp(call, "mmap") && (i == 2 || i == 3)) ||
+		 (!strcmp(call, "mprotect") && i == 2)
 		 ))
       int_enum((int)reg, call, i);
     else if (MATCH("int") || MATCH("unsigned int")

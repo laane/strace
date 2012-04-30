@@ -86,7 +86,7 @@ void		int_enum(int value, const char* call, int i)
     enum_access(value);
   else if (MATCH("open"))
     enum_open(value);
-  else if (MATCH("mmap") && i == 2)
+  else if ((MATCH("mmap") || MATCH("mprotect")) && i == 2)
     enum_mmap_prot(value);
   else if (MATCH("mmap") && i == 3)
     enum_mmap_flags(value);

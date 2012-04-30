@@ -35,12 +35,13 @@ static struct syscalls	*get_call_infos(const char *name)
   return NULL;
 }
 
-static int	get_syscall(int pid, char **strtab)
+static int		get_syscall(int pid, char **strtab)
 {
-  struct user	infos;
-  struct syscalls *call;
-  long		word;
-  int		status;
+  static char		first_call = 1;
+  struct user		infos;
+  struct syscalls	*call;
+  long			word;
+  int			status;
 
   /* Return call informations */
   if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
@@ -53,6 +54,8 @@ static int	get_syscall(int pid, char **strtab)
       fprintf(stderr, "Unknown call...\n");
       return 0;
     }
+  if (first_call && !(first_call = 0))
+    return 0; // first call is our strace() call
   fprintf(stderr, "%s(", call->name);
   print_args(call->name, call->p, infos, pid);
   fprintf(stderr, ")");
