@@ -6,6 +6,8 @@ db="syscall_db"
 
 rm -rf $db
 
-while read -r line ; do [ "$line" != "" ] && [ "${line%%$begin_line*}" = "" ] && echo "${line##$begin_line}" | cut -d' ' -f 1 | cut -f 1 >> $db ; done < $inc_file
+while read -r line
+do [ "$line" != "" ] && [ "${line%%$begin_line*}" = "" ] && echo "${line##$begin_line}" | cut -d' ' -f 1 | cut -f 1 >> $db
+done < $inc_file
 
 exit 0
