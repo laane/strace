@@ -996,7 +996,7 @@ struct syscalls	g_syscalls[] =
 				  "void*",
 				  "size_t",
 				  "int",
-				  NULL }}
+				  NULL }},
     { "getxattr", "ssize_t",	{ "char*",
 				  "char*",
 				  "void*",
@@ -1033,6 +1033,5 @@ struct syscalls	g_syscalls[] =
     { "fremovexattr",	"int",	{ "int",
 				  "char*",
 				  NULL }},
-
     { NULL,	NULL,		{ NULL }}
   };
