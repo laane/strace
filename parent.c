@@ -51,7 +51,8 @@ static int		get_syscall(int pid, char **strtab)
     return 0;
   if (!(call = get_call_infos(strtab[(int)infos.regs.rax])))
     {
-      fprintf(stderr, "Unknown call...\n");
+      fprintf(stderr, "Unimplemented syscall : %s\n",
+	      strtab[(int)infos.regs.rax]);
       return 0;
     }
   if (first_call && !(first_call = 0))
