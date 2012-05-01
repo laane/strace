@@ -5,7 +5,18 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <signal.h>
+#include <limits.h>
+#include <sys/ptrace.h>
 #include "strace.h"
+
+static int	gl_pid;
+
+static void	handler(int __attribute__((unused))sig)
+{
+  ptrace(PTRACE_DETACH, gl_pid, NULL, NULL);
+  exit(1);
+}
 
 static char **	get_syscalls(void)
 {
@@ -36,7 +47,7 @@ static char **	get_syscalls(void)
 
 static int	usage(void)
 {
-  fprintf(stderr, "Usage: ./strace file_to_trace\n");
+  fprintf(stderr, "Usage: ./strace [-p pid] | progname\n");
   return 1;
 }
 
@@ -47,8 +58,6 @@ static void	free_strtab(char **tab)
   for (i = 0; tab[i]; ++i)
     free(tab[i]);
 }
-
-extern char	**environ;
 
 static char	*getbinary(char *arg)
 {
@@ -79,15 +88,13 @@ static char	*getbinary(char *arg)
   return NULL;
 }
 
-int		main(int ac, char **av)
+static int	launch_progname(char **av)
 {
   char		**syscall_strtab;
   char		*bin;
-  pid_t		pid;
 
-  if (ac != 2)
+  if (!strcmp(av[1], "-p"))
     return usage();
-  /* if (access(av[1], X_OK)) */
   if (NULL == (bin = getbinary(av[1])))
     {
       fprintf(stderr, "File %s doesnt exist or has not execute permissions\n",
@@ -97,12 +104,48 @@ int		main(int ac, char **av)
   syscall_strtab = get_syscalls();
   if (syscall_strtab == NULL)
     exit_error("file syscall_db unreachable");
-  if ((pid = fork()) == -1)
+  if ((gl_pid = fork()) == -1)
     exit_error("fork fail");
-  if (!pid) /* child */
+  if (!gl_pid) /* child */
     exec_child(bin);
   else /* parent */
-    exec_parent(pid, syscall_strtab);
+    exec_parent(gl_pid, syscall_strtab);
   free_strtab(syscall_strtab);
+  return 0;
+}
+
+static int	trace_pid(char **av)
+{
+  char		**syscall_strtab;
+
+  if (strcmp(av[1], "-p"))
+    return usage();
+  gl_pid = atoi(av[2]);
+  if (gl_pid == 0 || gl_pid >= USHRT_MAX)
+    {
+      fprintf(stderr, "Abort: pid incorrect\n");
+      return 1;
+    }
+  syscall_strtab = get_syscalls();
+  if (syscall_strtab == NULL)
+    exit_error("file syscall_db unreachable");
+  exec_parent(gl_pid, syscall_strtab);
+  return 0;
+}
+
+int		main(int ac, char **av)
+{
+  if (signal(SIGINT, &handler) == SIG_ERR)
+    {
+      fprintf(stderr, "Abort: signal failed\n");
+      return 1;
+    }
+  if (ac == 2)
+    launch_progname(av);
+  else if (ac == 3)
+    trace_pid(av);
+  else
+    return usage();
+  /* if (access(av[1], X_OK)) */
   return 0;
 }
