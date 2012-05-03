@@ -1,6 +1,7 @@
 
 #include <string.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -14,6 +15,8 @@ static int	gl_pid;
 
 static void	handler(int __attribute__((unused))sig)
 {
+  wait4(gl_pid, NULL, WUNTRACED, NULL);
+  ptrace(PTRACE_CONT, gl_pid, NULL, NULL);
   ptrace(PTRACE_DETACH, gl_pid, NULL, NULL);
   exit(1);
 }
@@ -109,7 +112,7 @@ static int	launch_progname(char **av)
   if (!gl_pid) /* child */
     exec_child(bin);
   else /* parent */
-    exec_parent(gl_pid, syscall_strtab);
+    exec_parent(gl_pid, syscall_strtab, 1);
   free_strtab(syscall_strtab);
   return 0;
 }
@@ -129,7 +132,7 @@ static int	trace_pid(char **av)
   syscall_strtab = get_syscalls();
   if (syscall_strtab == NULL)
     exit_error("file syscall_db unreachable");
-  exec_parent(gl_pid, syscall_strtab);
+  exec_parent(gl_pid, syscall_strtab, 0);
   return 0;
 }
 

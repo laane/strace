@@ -90,11 +90,12 @@ static void	trace_process(int pid, char **strtab)
     }
 }
 
-void		exec_parent(int pid, char **strtab)
+void		exec_parent(int pid, char **strtab, char flag)
 {
   if (ptrace(PTRACE_ATTACH, pid, NULL, 0) == -1)
     {
-      kill(pid, SIGKILL);
+      if (flag)
+	kill(pid, SIGKILL);
       exit_error("Cannot attach parent process");
     }
   trace_process(pid, strtab);
