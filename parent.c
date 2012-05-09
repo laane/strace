@@ -20,7 +20,8 @@ static int	get_stopsig(int pid, char **strtab)
       || sig.si_signo == 19 || sig.si_signo == 25
       || sig.si_signo == SIGTRAP)
     return 0;
-  fprintf(stderr, "Killed by signal %d : %s\n", sig.si_signo, strerror(sig.si_errno));
+  fprintf(stderr, "Killed by signal %d\n",
+	  sig.si_signo); /* , strerror(sig.si_errno)); */
   return 1;
 }
 
@@ -67,9 +68,10 @@ static int		get_syscall(int pid, char **strtab)
   if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
     {      fprintf(stderr, "\t= ?\n");      return 1;    }
   if (strchr(call->rtype, '*'))
-    fprintf(stderr, "\t= %#lx\n", infos.regs.rax);
+    fprintf(stderr, "\t= %#lx", infos.regs.rax);
   else    
-    fprintf(stderr, "\t= %ld\n", infos.regs.rax);
+    fprintf(stderr, "\t= %ld", infos.regs.rax);
+  fprintf(stderr, "\n");
   return 0;
 }
 
