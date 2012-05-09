@@ -15,10 +15,10 @@ static int	gl_pid;
 
 static void	handler(int __attribute__((unused))sig)
 {
-  ptrace(PTRACE_CONT, gl_pid, NULL, NULL);
+  kill(gl_pid, SIGSTOP);
   wait4(gl_pid, NULL, WUNTRACED, NULL);
-  ptrace(PTRACE_CONT, gl_pid, NULL, NULL);
   ptrace(PTRACE_DETACH, gl_pid, NULL, NULL);
+  kill(gl_pid, SIGCONT);
   exit(1);
 }
 
