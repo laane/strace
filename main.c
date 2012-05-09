@@ -15,6 +15,7 @@ static int	gl_pid;
 
 static void	handler(int __attribute__((unused))sig)
 {
+  ptrace(PTRACE_CONT, gl_pid, NULL, NULL);
   wait4(gl_pid, NULL, WUNTRACED, NULL);
   ptrace(PTRACE_CONT, gl_pid, NULL, NULL);
   ptrace(PTRACE_DETACH, gl_pid, NULL, NULL);
@@ -110,7 +111,7 @@ static int	launch_progname(char **av)
   if ((gl_pid = fork()) == -1)
     exit_error("fork fail");
   if (!gl_pid) /* child */
-    exec_child(bin);
+    exec_child(bin, ++av);
   else /* parent */
     exec_parent(gl_pid, syscall_strtab, 1);
   free_strtab(syscall_strtab);
@@ -143,12 +144,9 @@ int		main(int ac, char **av)
       fprintf(stderr, "Abort: signal failed\n");
       return 1;
     }
-  if (ac == 2)
-    launch_progname(av);
-  else if (ac == 3)
+  if (ac == 3 && !strcmp(av[1], "-p"))
     trace_pid(av);
   else
-    return usage();
-  /* if (access(av[1], X_OK)) */
+    launch_progname(av);
   return 0;
 }
