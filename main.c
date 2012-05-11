@@ -146,7 +146,9 @@ int		main(int ac, char **av)
     }
   if (ac == 3 && !strcmp(av[1], "-p"))
     trace_pid(av);
-  else
+  else if (ac != 1)
     launch_progname(av);
+  else
+    usage();
   return 0;
 }
