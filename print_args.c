@@ -91,11 +91,12 @@ void	print_args(const char *call, char **args, struct user infos, int pid)
 		 (!strcmp(call, "access") && i == 1) ||
 		 (!strcmp(call, "open") && i == 1) ||
 		 (!strcmp(call, "mmap") && (i == 2 || i == 3)) ||
-		 (!strcmp(call, "mprotect") && i == 2)
+		 (!strcmp(call, "mprotect") && i == 2) ||
+		 (!strcmp(call, "futex") && i == 1)
 		 ))
       int_enum((int)reg, call, i);
     else if (MATCH("int") || MATCH("unsigned int")
-	     || MATCH("size_t"))
+	     || MATCH("size_t") || MATCH("pid_t"))
       fprintf(stderr, "%d", (int)reg);
     else if (MATCH("off_t"))
       fprintf(stderr, "%lu", reg);
@@ -105,6 +106,8 @@ void	print_args(const char *call, char **args, struct user infos, int pid)
     else if (MATCH("char**") &&
 	     (!strcmp(call, "execve")))
       print_strtab(reg, pid);
+    else if (strchr(args[i], '*'))
+      fprintf(stderr, "%s = %#lx", args[i], reg);
     else
       fprintf(stderr, "%s", args[i]);
     if (args[i+1])

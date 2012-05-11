@@ -79,6 +79,18 @@ void		enum_mmap_flags(int val)
       }
 }
 
+void		enum_futex_op(int val)
+{
+  char		flag = 0;
+
+  for (int i = 0; futex_op[i].str; ++i)
+    if (futex_op[i].val & val)
+      {
+	fprintf(stderr, (flag ? "|%s" : "%s"), futex_op[i].str);
+	flag = 1;
+      }
+}
+
 #define MATCH(x)	(!strcmp(call, x))
 void		int_enum(int value, const char* call, int i)
 {
@@ -90,4 +102,6 @@ void		int_enum(int value, const char* call, int i)
     enum_mmap_prot(value);
   else if (MATCH("mmap") && i == 3)
     enum_mmap_flags(value);
+  else if (MATCH("futex"))
+    enum_futex_op(value);
 }

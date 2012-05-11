@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <fcntl.h>
+#include <linux/futex.h>
 #include "strace.h"
 
 typedef struct	s_flags
@@ -61,4 +62,14 @@ t_flags		mmap_flags[] =
     {MAP_POPULATE, "MAP_POPULATE"},
     {MAP_STACK, "MAP_STACK"},
     {0, NULL}
+  };
+
+t_flags		futex_op[] =
+  {
+    {FUTEX_WAIT, "FUTEX_WAIT"},
+    {FUTEX_WAKE, "FUTEX_WAKE"},
+    {FUTEX_FD, "FUTEX_FD"},
+    {FUTEX_REQUEUE, "FUTEX_REQUEUE"},
+    {FUTEX_CMP_REQUEUE, "FUTEX_CMP_REQUEUE"},
+    {0, NULL},
   };
