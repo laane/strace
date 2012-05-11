@@ -16,10 +16,17 @@ static int	get_stopsig(int pid, char **strtab)
   sig.si_signo = 0;
   if (-1 == ptrace(PTRACE_GETSIGINFO, pid, NULL, &sig))
     return fprintf(stderr, "getsiginfo fail\n");
-  if (sig.si_signo == 0 || sig.si_signo == 18 /* SIGCONT 18 19 25 ... */
-      || sig.si_signo == 19 || sig.si_signo == 25
-      || sig.si_signo == SIGTRAP)
+  switch (sig.si_signo) {
+  case 0:
+  case 5:
+  case 17:
+  case 18:
+  case 19:
+  case 20:
+  case 25:
+  case 28:
     return 0;
+  }
   fprintf(stderr, "Killed by signal %d\n",
 	  sig.si_signo); /* , strerror(sig.si_errno)); */
   return 1;
@@ -67,10 +74,14 @@ static int		get_syscall(int pid, char **strtab)
   wait4(pid, &status, WUNTRACED, NULL);
   if (ptrace(PTRACE_GETREGS, pid, NULL, &infos) == -1)
     {      fprintf(stderr, "\t= ?\n");      return 1;    }
-  if (strchr(call->rtype, '*'))
+  if (strchr(call->rtype, '*')) {
     fprintf(stderr, "\t= %#lx", infos.regs.rax);
-  else    
-    fprintf(stderr, "\t= %ld", infos.regs.rax);
+  } else {
+    if ((int)infos.regs.rax < 0)
+      fprintf(stderr, "\t= %d (%s)", -1, strerror(-infos.regs.rax));
+    else
+      fprintf(stderr, "\t= %ld", infos.regs.rax);
+  }
   fprintf(stderr, "\n");
   return 0;
 }
